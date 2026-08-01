@@ -1,0 +1,8 @@
+{
+  "name": "1 Touch Mailist Builder Final",
+  "description": "Automated cyberpunk email list crawler, scraper, auto-saver, and categorization dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
