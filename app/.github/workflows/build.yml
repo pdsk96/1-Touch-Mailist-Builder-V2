@@ -15,15 +15,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'gradle'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Setup Environment and Default Keystore
         run: |
@@ -33,7 +41,7 @@ jobs:
           if [ -f debug.keystore.base64 ]; then
             base64 -d debug.keystore.base64 > debug.keystore
           elif [ ! -f debug.keystore ]; then
-            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            keytool -genkey -v -storetype PKCS12 -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
           # Ensure release build uses identical default keystore if no custom key provided
           if [ ! -f my-upload-key.jks ]; then
@@ -46,7 +54,7 @@ jobs:
       - name: Build Debug APK
         run: gradle assembleDebug --stacktrace
         env:
-          KEYSTORE_PATH: debug.keystore
+          KEYSTORE_PATH: ${{ github.workspace }}/debug.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD || 'android' }}
           KEY_ALIAS: androiddebugkey
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'android' }}
@@ -54,7 +62,7 @@ jobs:
       - name: Build Release APK
         run: gradle assembleRelease --stacktrace
         env:
-          KEYSTORE_PATH: debug.keystore
+          KEYSTORE_PATH: ${{ github.workspace }}/debug.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD || 'android' }}
           KEY_ALIAS: androiddebugkey
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'android' }}
