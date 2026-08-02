@@ -52,7 +52,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'android' }}
 
       - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace --no-daemon --max-workers=2 -Dorg.gradle.parallel=false -Dorg.gradle.configuration-cache=false -Dorg.gradle.jvmargs='-Xmx1536m -Dfile.encoding=UTF-8 -XX:MaxMetaspaceSize=512m'
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/debug.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD || 'android' }}
@@ -60,7 +60,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'android' }}
 
       - name: Build Release APK
-        run: gradle assembleRelease --stacktrace
+        run: gradle assembleRelease --stacktrace --no-daemon --max-workers=2 -Dorg.gradle.parallel=false -Dorg.gradle.configuration-cache=false -Dorg.gradle.jvmargs='-Xmx1536m -Dfile.encoding=UTF-8 -XX:MaxMetaspaceSize=512m'
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/debug.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD || 'android' }}
